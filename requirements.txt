@@ -7,9 +7,12 @@ aioredis>=2.0.0
 python-dotenv>=0.19.0
 
 # Validação e modelagem de dados (utilizando Pydantic 2.x e pydantic-settings)
-# Pois a versão mais comumente utilizada está deprecated
 pydantic>=2.0.0
 pydantic-settings>=0.6.0
+
+# Autenticação e segurança
+PyJWT>=2.0.0
+passlib[bcrypt]>=1.7.4
 
 # Dependências para testes
 pytest>=7.0.0

@@ -1,14 +1,15 @@
-# app/main.py
 import time
-from fastapi import FastAPI, Request
-from app.api.routes import router as client_router
-from app.core.config import settings
+from fastapi import FastAPI, Request, HTTPException, status
 import aioredis
+from app.core.config import settings
+from app.api.auth_routes import router as auth_router
+from app.api.routes import router as client_router
 
 app = FastAPI(title=settings.APP_NAME)
 
-# Inclui as rotas de clientes
-app.include_router(client_router)
+# Inclui as rotas de autenticação e clientes
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(client_router, prefix="/clients", tags=["clients"])
 
 # Variável global para medir o up-time
 start_time = time.time()
@@ -23,7 +24,7 @@ async def startup_event():
 async def shutdown_event():
     await app.state.redis.close()
 
-# Middleware para contar as requisições (armazena a contagem no Redis)
+# Middleware para contar as requisições (armazenadas no Redis)
 @app.middleware("http")
 async def add_request_count(request: Request, call_next):
     redis = app.state.redis
@@ -49,5 +50,5 @@ async def status():
 
 # Cria as tabelas no banco (caso não existam)
 from app.core.database import engine
-from app.models.init import Base
+from app.models.user import Base
 Base.metadata.create_all(bind=engine)
